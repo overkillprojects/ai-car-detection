@@ -182,6 +182,8 @@ You'll have to sign into your Edge Impulse account to access your models.
 
 You should check if your device is connected to your project by going to your [Edge Impulse project](https://studio.edgeimpulse.com/studio/select-project) and clicking **Devices**. Your device should not be named camera at first; I just renamed mine.
 
+![What a connected device should look like.](eidevices.jpg)
+
 If that all worked out for you, you're set! You connected to the board and
 you're ready to move onto the other steps.
 
