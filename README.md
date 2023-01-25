@@ -1,10 +1,25 @@
 # Renesas RZ/V2L Object Detection Project - Detecting Cars
 
+## Problem Overview
+
+Traffic monitoring often uses intrusive and expensive devices to count the number
+cars that pass by a given stretch of road. Can we build a simple device that
+attaches to road signs and counts cars using AI with similar accuracy?
+
+## Dataset
+
+I will be producing a proof of concept using a Renesas RZ/V2L Evaluation Board
+Kit. The catch is that I will be sharing time on this board with other students,
+and I will be accessing it remotely. In order to bootstrap the process, I will
+be using a public dataset from [kaggle](https://www.kaggle.com).
+
+SAMPLE IMAGES FROM THE DATASET
+
 ## Hardware Requirements
 
 - Renesas [RZ/V2L Evaluation Board Kit](https://www.renesas.com/eu/en/products/microcontrollers-microprocessors/rz-mpus/rzv2l-evkit-rzv2l-evaluation-board-kit)
 - If you plan on remote access to the board, as I did here, you will
-need a router that allows port-forwarding.
+  need a router that allows port-forwarding.
 - Possibly an enclosure, depending on where you are placing your board.
 
 ## Software Requirements
@@ -12,7 +27,6 @@ need a router that allows port-forwarding.
 - Edge Impulse account
 - Yocto build for the board (via the instructions from Renesas and Edge Impulse).
 - A terminal with `ssh`.
-
 
 ## First Steps
 
@@ -24,8 +38,6 @@ object detection on this board, I recommend that you follow
 for a smooth experience to get you some practice and insight.
 
 ## 1. Set up and connected the Renesas RZ/V2L board to the Edge Impulse Project
-
-<!-- I don't know how you got the port for the ssh command and I think it should be included here, along with the creation of a user -->
 
 The [setup instructions](https://docs.edgeimpulse.com/docs/development-platforms/officially-supported-cpu-gpu-targets/renesas-rz-v2l)
 for the board went relatively smoothly. The only
@@ -56,13 +68,13 @@ sudo npm config set user root
 sudo npm install edge-impulse-linux -g --unsafe-perm
 ```
 
-Now that everything is setup and ready to go, we run the Edge Impulse runner.
+Now that everything is setup and ready to go, we start the Edge Impulse CLI.
 
 ```ssh
-sudo edge-impulse-linux-runner
+sudo edge-impulse-linux
 ```
 
-You'll have to sign into your EI account to access your models.
+You'll have to sign into your Edge Impulse account to access your models.
 
 If that all worked out for you, you're set! You connected to the board and
 you're ready to move onto the other steps.
@@ -70,7 +82,7 @@ you're ready to move onto the other steps.
 ## 2. Reformatted the CSV for a new dataset into JSON for Edge Impulse to accept it
 
 Because I have limited access to the physical board, which is shared with other
-students and this project is only a proof of concept, I decided to train my
+students, and since this project is only a proof of concept, I decided to train my
 model using a public dataset, in this case a car detection dataset
 from [kaggle](https://www.kaggle.com/). However, the bounding box data for my
 dataset came as a `CSV`, where Edge Impulse expects a
