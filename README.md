@@ -17,8 +17,7 @@ Kit. The catch is that I will be sharing time on this board with other students,
 and I will be accessing it remotely. In order to bootstrap the process, I will
 be using a public dataset from [kaggle](https://www.kaggle.com).
 
-The creator of the dataset had a camera mounted to a street sign, capturing
-images every <TIME UNIT?>. Here are a few sample images.
+The creator of the dataset had a camera mounted to a moving car. Here are a few sample images.
 
 ![Sample 1](dataset_sample_1.jpg)
 
@@ -45,6 +44,8 @@ as a warm-up. If you want something smaller to try out before you get into
 object detection on this board, I recommend that you follow
 [this guide](https://docs.edgeimpulse.com/docs/tutorials/image-classification)
 for a smooth experience to get you some practice and insight.
+
+Heads up: I reference the left navigation a lot. If it is not showing for you on the left side of the screen, you will have to click the menu icon in the top left to access it.
 
 ## 1. Board setup
 
@@ -179,6 +180,8 @@ sudo edge-impulse-linux
 
 You'll have to sign into your Edge Impulse account to access your models.
 
+You should check if your device is connected to your project by going to your [Edge Impulse project](https://studio.edgeimpulse.com/studio/select-project) and clicking **Devices**. Your device should not be named camera at first; I just renamed mine.
+
 If that all worked out for you, you're set! You connected to the board and
 you're ready to move onto the other steps.
 
@@ -193,7 +196,12 @@ dataset came as a `csv`, where Edge Impulse expects a
 `json` file. Not to be deterred, I decided to create
 [a script](https://github.com/ajaxromik/boundingBoxesCSVToJSON/blob/main/converter.py)
 to convert the data to the correct format using
-[Python](https://www.python.org/downloads/)
+[Python](https://www.python.org/downloads/).
+
+If you plan on using images that you take manually, you will need to manually draw bounding boxes after uploading your data. 
+However, if your object is a part of the 
+[COCO Dataset](https://cocodataset.org/#home), 
+you can classify objects using Yolov5 when labeling your data. Either way, if you have taken some images from similar angles and distances, you are ready to upload your data.
 
 My original `csv` file was in the format
 
@@ -204,9 +212,38 @@ image_name,x_min,y_min,x_max,y_max
 so the script should work for you (up to some renaming) if you have the same.
 The script will create a `bounding_boxes.labels` file for you.
 
+Click on **Data acquisition** on the left navigation then click on **Upload data**. 
+If you uploaded images that you took manually, just use the 'Choose files' button and select your images from your computer. 
+If you have a `.labels` file, use the 'Choose files' button, but don't forget to upload the `bounding_boxes.labels` along with the images.
+
+If you have uploaded your images without a `.labels` file you will have to label the data; 
+otherwise, skip to [step 4](#4.-prepare-the-model-and-train-it). 
+Click on 'Labeling queue'. Now, if your object is part of the 
+[COCO Dataset](https://cocodataset.org/#home), click the dropdown on the right and change 
+'Track objects between frames' to 'Classify using YOLOv5'.
+
+![Image of the dropdown in question](eitutoriallabeling.jpg)
+
+YOLOv5 will now automatically create bounding boxes, but you can change or add any boxes that you want. 
+For all other types of objects, you will have to manually click and hold to draw a bounding box over each object in your images.
+
 ## 4. Prepare the model and train it
 
+I followed the tutorial for [Object Detection using FOMO](https://docs.edgeimpulse.com/docs/tutorials/detect-objects-using-fomo), but I should note that there are other options available.
+One option is image classification with the MobileNet v1 or v2, which you can follow the tutorial for [here](https://docs.edgeimpulse.com/docs/tutorials/image-classification).
+Another option is using the Yolov5 model, which requires you to use 320x320 for the image resolution in the image design. The training for Yolov5 may fail without the proper resolution.
+
+### Deploying the model to your RZ/V2L
+
 All that is left is to test the model and load it onto the board.
+
+In order to test the model, click **Model testing** in the left navigation. Once you are there, click **Classify all** to validate your model.
+
+The result should look something like this:
+
+![Edge Impulse classification results](eiclassification.jpg)
+
+If you want to download the model onto your device manually, you can use this command:
 
 ```bash
 sudo edge-impulse-linux-runner --download downloaded-model.eim
