@@ -180,6 +180,8 @@ sudo edge-impulse-linux
 
 You'll have to sign into your Edge Impulse account to access your models.
 
+---
+
 You should check if your device is connected to your project by going to your [Edge Impulse project](https://studio.edgeimpulse.com/studio/select-project) and clicking **Devices**. Your device should not be named camera at first; I just renamed mine.
 
 ![What a connected device should look like.](eidevices.jpg)
@@ -200,10 +202,8 @@ dataset came as a `csv`, where Edge Impulse expects a
 to convert the data to the correct format using
 [Python](https://www.python.org/downloads/).
 
-If you plan on using images that you take manually, you will need to manually draw bounding boxes after uploading your data. 
-However, if your object is a part of the 
-[COCO Dataset](https://cocodataset.org/#home), 
-you can classify objects using Yolov5 when labeling your data. Either way, if you have taken some images from similar angles and distances, you are ready to upload your data.
+If you plan on using images that you take manually, you will need to also manually draw bounding boxes after uploading your data.
+In that case, feel free to ignore this script and go straight to uploading your data.
 
 My original `csv` file was in the format
 
@@ -218,13 +218,14 @@ Click on **Data acquisition** on the left navigation then click on **Upload data
 If you uploaded images that you took manually, just use the 'Choose files' button and select your images from your computer. 
 If you have a `.labels` file, use the 'Choose files' button, but don't forget to upload the `bounding_boxes.labels` along with the images.
 
-If you have uploaded your images without a `.labels` file you will have to label the data; 
-otherwise, skip to [step 4](#4.-prepare-the-model-and-train-it). 
-Click on 'Labeling queue'. Now, if your object is part of the 
+If you have uploaded your images with a `.labels` file, skip to [step 4](#4-prepare-the-model-and-train-it); otherwise, you have to label the data.
+
+Click on **Labeling queue**. 
+Now, if your object is part of the 
 [COCO Dataset](https://cocodataset.org/#home), click the dropdown on the right and change 
 'Track objects between frames' to 'Classify using YOLOv5'.
 
-![Image of the dropdown in question](eitutoriallabeling.jpg)
+![Image of the dropdown in question](eilabeling.jpg)
 
 YOLOv5 will now automatically create bounding boxes, but you can change or add any boxes that you want. 
 For all other types of objects, you will have to manually click and hold to draw a bounding box over each object in your images.
@@ -232,8 +233,54 @@ For all other types of objects, you will have to manually click and hold to draw
 ## 4. Prepare the model and train it
 
 I followed the tutorial for [Object Detection using FOMO](https://docs.edgeimpulse.com/docs/tutorials/detect-objects-using-fomo), but I should note that there are other options available.
-One option is image classification with the MobileNet v1 or v2, which you can follow the tutorial for [here](https://docs.edgeimpulse.com/docs/tutorials/image-classification).
-Another option is using the Yolov5 model, which requires you to use 320x320 for the image resolution in the image design. The training for Yolov5 may fail without the proper resolution.
+One option is image classification with the MobileNet v1 or v2, following [this tutorial](https://docs.edgeimpulse.com/docs/tutorials/image-classification).
+Another option is using the YOLOv5 model, which requires you to use 320x320 for the image resolution in the image design. The training for YOLOv5 may fail without the proper resolution.
+
+Now that we have our data, we should double check to make sure that it is balanced properly. We want about 20% of our data to be set aside for validation after the model is trained. If your sets are nowhere near 80% and 20%, click **Dashboard**, scroll to the bottom of the page and click **Perform train/test split**.
+
+![How a good split should look 81% and 19%](eitraintest.jpg)
+
+### Impulse Design
+
+Now it's time to design our impulse! First off, click **Create impulse** in the left navigation. 
+Using FOMO, we can set our 'Image width' and 'Image height' to anything as long as it is square. 
+For example, I used a 160x160 resolution.
+
+**If you are using YOLOv5 and *NOT* FOMO**, the resolution here must be 320x320. If you have been using FOMO as I have been for this tutorial, choose any square resolution.
+
+Set the 'Resize mode' to 'Fit shortest axis'. 
+Click **Add a processing block**, and click the **Add** button to the right of 'Image'. Click **Add a learning block**, and click the **Add** button to the right of 'Object Detection (Images)' with the author 'Edge Impulse'. Then click **Save impulse**.
+
+Your impulse should look like this:
+
+![Finished Impulse Design](eidesign.jpg)
+
+Under 'Impulse Design' on the left navigation, click **Image** and change the 'Color depth' to **Grayscale**. Then click **Save parameters**.
+
+Note: FOMO currently can only accept Grayscale images.
+
+You should be taken to the 'Feature generation' screen. 
+Just click **Generate features** in order to prepare your images for the machine learning model. 
+A feature explorer will appear when the job finishes, and it will look something like this:
+
+![How a finished feature explorer looks](eifeatures.jpg)
+
+### Training the model
+
+At this point, we have our images ready to use to train our machine learning model.
+
+First off, click **Object detection**. 
+Change the 'Target' in the top left to be 'Renesas RZ/V2L (with DRP-AI accelerator)'. 
+Since I am using the FOMO model, I chose 'FOMO (Faster Objects, More Objects) MobileNetV2 0.35'.
+You can also use the YOLOv5 model, just make sure that you have images of 320x320 resolution.
+
+Make sure to use a **Learning rate of 0.001**. Then click **Start training**. Once the model is done, you can see the accuracy numbers like so:
+
+![Accuracy numbers of a trained model](eitrained.jpg)
+
+If you've followed along so far, you have now trained your object detection model!
+
+### Validating the model
 
 ### Deploying the model to your RZ/V2L
 
