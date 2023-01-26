@@ -280,9 +280,7 @@ Make sure to use a **Learning rate of 0.001**. Then click **Start training**. On
 
 If you've followed along so far, you have now trained your object detection model!
 
-### Validating the model
-
-### Deploying the model to your RZ/V2L
+### Testing and deploying the model to your RZ/V2L
 
 All that is left is to test the model and load it onto the board.
 
@@ -291,6 +289,20 @@ In order to test the model, click **Model testing** in the left navigation. Once
 The result should look something like this:
 
 ![Edge Impulse classification results](eiclassification.jpg)
+
+The impulse is now ready to run on the Renesas RZ/V2L!
+
+---
+
+[\\]: # (This is the last part that needs more content and not just to be edited)
+
+Since we are using a Linux-based device, we can just put
+
+```bash
+edge-impulse-linux-runner
+```
+
+into the command line on our device.
 
 If you want to download the model onto your device manually, you can use this command:
 
